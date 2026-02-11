@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exponent Sniper M.5 - เลขยกกำลัง</title>
+    <style>
+        /* CSS Section */
+        body { 
+            background: #05070a; color: #00ff41; 
+            font-family: 'Courier New', monospace; text-align: center; 
+            margin: 0; padding: 20px;
+        }
+        .game-wrapper { max-width: 600px; margin: 0 auto; }
+        h2 { text-shadow: 0 0 10px #00ff41; }
+        .info-panel { 
+            background: #0f1510; border: 1px solid #00ff41; 
+            display: inline-block; padding: 15px; margin-bottom: 15px; border-radius: 5px;
+            line-height: 1.6;
+        }
+        canvas { 
+            border: 1px solid #00ff41; background: #000; 
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.2); cursor: crosshair;
+            max-width: 100%; height: auto;
+        }
+        .input-group { margin: 15px 0; font-size: 1.1rem; }
+        input { 
+            background: #000; border: 1px solid #00ff41; color: #00ff41; 
+            padding: 10px; width: 100px; font-size: 1.1rem; outline: none;
+            text-align: center;
+        }
+        button { 
+            background: #00ff41; color: #000; border: none; 
+            padding: 10px 25px; cursor: pointer; font-weight: bold; 
+            transition: 0.3s; margin-left: 10px;
+        }
+        button:hover { background: #fff; box-shadow: 0 0 10px #fff; }
+        #feedback { font-size: 1.1rem; height: 25px; margin-top: 10px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="game-wrapper">
+    <h2>🎯 Exponent Sniper (ม.5)</h2>
+    
+    <div class="info-panel">
+        เป้าหมาย (Ship) อยู่ที่ค่า <strong>y = <span id="target-y">?</span></strong><br>
+        ฐานอาวุธ (Base) = <strong><span id="current-base">?</span></strong>
+    </div>
+
+    <div class="input-group">
+        <span>คำนวณเลขชี้กำลัง (x) = </span>
+        <input type="number" id="user-exponent" step="0.1" placeholder="ค่า x">
+        <button onclick="fire()">FIRE!</button>
+    </div>
+
+    <p id="feedback">เล็งพิกัด x เพื่อทำลายเป้าหมาย</p>
+    
+    <canvas id="graphCanvas" width="550" height="550"></canvas>
+</div>
+
+<script>
+    /* JavaScript Section */
+    const canvas = document.getElementById('graphCanvas');
+    const ctx = canvas.getContext('2d');
+    const scale = 50; 
+    let base = 2, targetX = 0, targetY = 0, lastUserX = null;
+
+    function initRound() {
+        // ชุดโจทย์เลขยกกำลัง ม.5 (เน้นถอดรากและเลขติดลบ)
+        const basePool = [2, 3, 4, 5, 0.5, 0.25];
+        const exps = [-2, -1, -0.5, 0, 0.5, 1, 1.5, 2];
+        
+        base = basePool[Math.floor(Math.random() * basePool.length)];
+        targetX = exps[Math.floor(Math.random() * exps.length)];
+        targetY = Math.pow(base, targetX);
+        
+        document.getElementById('current-base').innerText = base;
+        document.getElementById('target-y').innerText = targetY.toFixed(3).replace(/\.?0+$/, '');
+        document.getElementById('user-exponent').value = '';
+        lastUserX = null;
+        draw();
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const cx = canvas.width / 2;
+        const cy = canvas.height / 2 + 100;
+
+        // 1. วาดเส้น Grid
+        ctx.strokeStyle = "#111";
+        ctx.lineWidth = 1;
+        for(let i = -10; i <= 10; i++) {
+            ctx.beginPath(); ctx.moveTo(cx + i * scale, 0); ctx.lineTo(cx + i * scale, canvas.height); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(0, cy - i * scale); ctx.lineTo(canvas.width, cy - i * scale); ctx.stroke();
+        }
+
+        // 2. วาดแกนหลัก
+        ctx.strokeStyle = "#333";
+        ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(0, cy); ctx.lineTo(canvas.width, cy); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, canvas.height); ctx.stroke();
+
+        // 3. วาดเส้นโค้งฟังก์ชัน y = a^x (Reference Line)
+        ctx.strokeStyle = "rgba(0, 255, 65, 0.15)";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        for (let x = -5; x <= 5; x += 0.1) {
+            let plotX = cx + x * scale;
+            let plotY = cy - Math.pow(base, x) * scale;
+            if (x === -5) ctx.moveTo(plotX, plotY); else ctx.lineTo(plotX, plotY);
+        }
+        ctx.stroke();
+
+        // 4. วาดวิถีกระสุน
+        if (lastUserX !== null) {
+            ctx.strokeStyle = "#fff";
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            for (let x = -5; x <= lastUserX; x += 0.1) {
+                let plotX = cx + x * scale;
+                let plotY = cy - Math.pow(base, x) * scale;
+                if (x === -5) ctx.moveTo(plotX, plotY); else ctx.lineTo(plotX, plotY);
+            }
+            ctx.stroke();
+        }
+
+        // 5. วาดเป้าหมายสีแดง (จุดเล็ก)
+        ctx.fillStyle = "red";
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = "red";
+        ctx.beginPath();
+        ctx.arc(cx + targetX * scale, cy - targetY * scale, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+    }
+
+    function fire() {
+        const input = document.getElementById('user-exponent').value;
+        if (input === "") return;
+        
+        lastUserX = parseFloat(input);
+        draw();
+        
+        const feedback = document.getElementById('feedback');
+        if (Math.abs(lastUserX - targetX) < 0.01) {
+            feedback.innerText = "🎯 BULLSEYE! คำนวณเลขชี้กำลังถูกต้อง!";
+            feedback.style.color = "#00ff41";
+            setTimeout(initRound, 1500);
+        } else {
+            feedback.innerText = "❌ MISS! วิถีกระสุนคลาดเคลื่อน ลองใหม่!";
+            feedback.style.color = "#ff4141";
+        }
+    }
+
+    initRound();
+</script>
+
+</body>
+</html>
