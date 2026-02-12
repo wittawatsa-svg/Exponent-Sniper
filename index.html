@@ -3,36 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Exponent Sniper - Fixed Version</title>
+    <title>Exponent Sniper - Full Fix</title>
     <style>
         body { background: #05070a; color: #00ff41; font-family: 'Courier New', monospace; text-align: center; margin: 0; padding: 10px; }
         .game-wrapper { max-width: 600px; margin: 0 auto; }
         .info-panel { background: #0f1510; border: 1px solid #00ff41; padding: 15px; margin-bottom: 10px; border-radius: 5px; }
         
-        /* --- จุดที่แก้ไข: ลบปุ่มลูกศรออกถาวร --- */
-        input#user-exponent { 
-            background: #000; 
-            border: 2px solid #00ff41; 
-            color: #fff; 
-            padding: 10px; 
-            width: 120px; 
-            text-align: center; 
-            font-size: 1.5rem; 
+        /* --- จุดที่แก้: บังคับให้เป็นช่องพิมพ์แบบไม่มีปุ่มเลื่อนแน่นอน --- */
+        .input-box {
+            background: #000;
+            border: 2px solid #00ff41;
+            color: #fff;
+            padding: 12px;
+            width: 140px;
+            text-align: center;
+            font-size: 1.8rem;
             outline: none;
-            /* ป้องกัน Spinner ใน Chrome/Safari/Edge */
-            -webkit-appearance: none; 
-            /* ป้องกัน Spinner ใน Firefox */
-            -moz-appearance: textfield; 
+            /* ลบ Spinner ออกทุรูปแบบ */
+            -webkit-appearance: none !important;
+            -moz-appearance: textfield !important;
+            appearance: none !important;
             margin: 0;
+            display: inline-block;
         }
-        input#user-exponent:focus { border-color: #ffff00; box-shadow: 0 0 10px #ffff00; }
 
-        button#fireBtn { background: #00ff41; color: #000; border: none; padding: 12px 30px; cursor: pointer; font-weight: bold; font-size: 1.2rem; margin-left: 10px; }
-        button#fireBtn:disabled { background: #333; color: #666; }
+        button#fireBtn { background: #00ff41; color: #000; border: none; padding: 15px 30px; cursor: pointer; font-weight: bold; font-size: 1.3rem; margin-left: 10px; vertical-align: top; }
+        button#fireBtn:disabled { background: #222; color: #444; }
+        
         canvas { border: 1px solid #00ff41; background: #000; width: 100%; height: auto; max-width: 500px; margin-top: 20px; }
         .stats-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-weight: bold; }
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 100; }
-        .modal { background: #0f1510; border: 2px solid #00ff41; padding: 25px; border-radius: 10px; width: 80%; max-width: 350px; }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: flex; align-items: center; justify-content: center; z-index: 100; }
+        .modal { background: #0f1510; border: 2px solid #00ff41; padding: 25px; border-radius: 10px; width: 85%; max-width: 350px; }
     </style>
 </head>
 <body>
@@ -41,11 +42,12 @@
     <!-- หน้าจอ Login -->
     <div id="login-screen" class="overlay">
         <div class="modal">
-            <h3>🎯 Sniper ม.5 (แบบพิมพ์ตอบ)</h3>
-            <input type="text" id="p-name" placeholder="ชื่อ-นามสกุล" style="width:90%; padding:10px; margin-bottom:10px;"><br>
-            <input type="text" id="p-class" placeholder="ชั้น" style="width:40%; padding:10px;">
-            <input type="text" id="p-no" placeholder="เลขที่" style="width:40%; padding:10px;">
-            <br><button onclick="startGame()" style="margin-top:20px; width:100%;">เริ่มเกม</button>
+            <h3>🎯 Sniper ม.5 (Fixed)</h3>
+            <p style="font-size:0.8rem; color:#888;">พิมพ์คำตอบลงในช่องแล้วกดยิง</p>
+            <input type="text" id="p-name" placeholder="ชื่อ-นามสกุล" style="width:90%; padding:10px; margin-bottom:10px; background:#000; border:1px solid #00ff41; color:#00ff41;"><br>
+            <input type="text" id="p-class" placeholder="ชั้น" style="width:40%; padding:10px; background:#000; border:1px solid #00ff41; color:#00ff41;">
+            <input type="text" id="p-no" placeholder="เลขที่" style="width:40%; padding:10px; background:#000; border:1px solid #00ff41; color:#00ff41;">
+            <br><button onclick="startGame()" style="margin-top:20px; width:100%;">เริ่มภารกิจ</button>
         </div>
     </div>
 
@@ -63,26 +65,26 @@
             <span style="color:#00ff41">ข้อที่: <span id="round-count">1</span>/10</span>
             <span style="color:#ffff00">Score: <span id="score-val">0</span></span>
         </div>
-        <div style="font-size:1.2rem; border-top:1px solid #222; padding-top:10px;">
+        <div style="font-size:1.3rem; border-top:1px solid #222; padding-top:10px;">
             Target: <b>y = <span id="target-y">?</span></b> | Base: <b>a = <span id="current-base">?</span></b>
         </div>
     </div>
 
-    <div style="margin: 20px 0; display: flex; align-items: center; justify-content: center;">
-        <span style="font-size:1.2rem">ค่า x = </span>
-        <!-- เปลี่ยนเป็น type="text" และเพิ่ม inputmode เพื่อให้พิมพ์ได้ 100% -->
-        <input type="text" id="user-exponent" inputmode="decimal" autocomplete="off" placeholder="...">
+    <div style="margin: 20px 0;">
+        <span style="font-size:1.5rem">ค่า x = </span>
+        <!-- เปลี่ยน ID เป็น sniper-input เพื่อล้างค่าจำของ Browser -->
+        <input type="text" id="sniper-input" class="input-box" inputmode="decimal" autocomplete="off" placeholder="?">
         <button id="fireBtn" onclick="fire()">FIRE!</button>
     </div>
 
-    <div id="feedback" style="height:1.5em; font-weight:bold;"></div>
+    <div id="feedback" style="height:1.5em; font-weight:bold; font-size:1.2rem;"></div>
     <canvas id="graphCanvas" width="500" height="550"></canvas>
 </div>
 
 <script>
     const canvas = document.getElementById('graphCanvas');
     const ctx = canvas.getContext('2d');
-    const inputEl = document.getElementById('user-exponent');
+    const inputEl = document.getElementById('sniper-input');
     const fireBtn = document.getElementById('fireBtn');
     const scale = 50;
     const SCRIPT_URL = "ใส่_WEB_APP_URL_ของคุณที่นี่";
@@ -90,7 +92,6 @@
     let base, targetX, targetY, lastUserX = null, score = 0, round = 1, isHit = false, isLock = false;
     let playerInfo = {};
 
-    // กด Enter เพื่อยิง
     inputEl.addEventListener('keypress', (e) => { if(e.key === 'Enter') fire(); });
 
     function startGame() {
@@ -108,12 +109,11 @@
         if (round > 10) return finishGame();
         isLock = false; isHit = false; lastUserX = null;
         
-        // ล้างค่าและเปิดช่องให้พิมพ์
+        // บังคับเคลียร์ช่องและปลดล็อก
         inputEl.value = '';
         inputEl.disabled = false;
         fireBtn.disabled = false;
         
-        // สุ่มโจทย์ (ข้อความสำคัญ: targetX คือคำตอบที่เด็กต้องหามาพิมพ์)
         const basePool = [2, 3, 5, 0.5, 0.2];
         const exps = [-2, -1, 0, 1, 2]; 
         base = basePool[Math.floor(Math.random() * basePool.length)];
@@ -123,33 +123,28 @@
         document.getElementById('round-count').innerText = round;
         document.getElementById('current-base').innerText = base;
         document.getElementById('target-y').innerText = Number(targetY.toFixed(3));
-        document.getElementById('feedback').innerText = "ระบุค่า x แล้วกดยิง!";
+        document.getElementById('feedback').innerText = "พิมพ์ค่า x แล้วกดยิง!";
         document.getElementById('feedback').style.color = "#00ff41";
         
         draw();
-        setTimeout(() => inputEl.focus(), 100);
+        setTimeout(() => inputEl.focus(), 200);
     }
 
     function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         const cx = canvas.width/2, cy = canvas.height/2 + 100;
-        
-        // Grid
         ctx.strokeStyle = "#111";
         for(let i=-10; i<=10; i++) {
             ctx.beginPath(); ctx.moveTo(cx+i*scale, 0); ctx.lineTo(cx+i*scale, canvas.height); ctx.stroke();
             ctx.beginPath(); ctx.moveTo(0, cy-i*scale); ctx.lineTo(canvas.width, cy-i*scale); ctx.stroke();
         }
-        
-        // แกน XY
         ctx.strokeStyle = "#333";
         ctx.beginPath(); ctx.moveTo(0, cy); ctx.lineTo(canvas.width, cy); ctx.stroke();
         ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, canvas.height); ctx.stroke();
 
-        // กราฟเฉลย
         if (lastUserX !== null) {
             ctx.strokeStyle = isHit ? "#fff" : "#ff4141";
-            ctx.lineWidth = 3;
+            ctx.lineWidth = 4;
             ctx.beginPath();
             for (let x = -8; x <= lastUserX; x += 0.1) {
                 let py = cy - Math.pow(base, x) * scale;
@@ -159,29 +154,27 @@
             ctx.stroke();
         }
 
-        // เป้าหมาย
         ctx.fillStyle = isHit ? "#fff" : "red";
         ctx.beginPath();
-        ctx.arc(cx + targetX*scale, cy - targetY*scale, isHit?12:8, 0, Math.PI*2);
+        ctx.arc(cx + targetX*scale, cy - targetY*scale, isHit?15:10, 0, Math.PI*2);
         ctx.fill();
     }
 
     function fire() {
-        if (inputEl.value === "" || isLock) return;
+        if (inputEl.value.trim() === "" || isLock) return;
         isLock = true;
         let ans = parseFloat(inputEl.value);
         lastUserX = ans;
         inputEl.disabled = true;
         fireBtn.disabled = true;
 
-        // เช็คคำตอบ
         if (Math.abs(ans - targetX) < 0.01) {
             isHit = true; score += 10;
             document.getElementById('feedback').innerText = "🎯 สำเร็จ!";
             document.getElementById('feedback').style.color = "#00ff41";
         } else {
             score = 0;
-            document.getElementById('feedback').innerText = `❌ พลาด! คำตอบคือ ${targetX}`;
+            document.getElementById('feedback').innerText = `❌ พลาด! เฉลยคือ x = ${targetX}`;
             document.getElementById('feedback').style.color = "#ff4141";
         }
 
@@ -193,7 +186,7 @@
 
     function finishGame() {
         document.getElementById('finish-screen').style.display = 'flex';
-        document.getElementById('final-stats').innerHTML = `ชื่อ: ${playerInfo.name}<br>คะแนน: ${score}`;
+        document.getElementById('final-stats').innerHTML = `ชื่อ: ${playerInfo.name}<br>คะแนน: ${score} แต้ม`;
     }
 </script>
 </body>
