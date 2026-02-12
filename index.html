@@ -3,47 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Exponent Sniper - Full Fix</title>
+    <title>Exponent Sniper - Classic Style</title>
     <style>
         body { background: #05070a; color: #00ff41; font-family: 'Courier New', monospace; text-align: center; margin: 0; padding: 10px; }
-        .game-wrapper { max-width: 600px; margin: 0 auto; }
-        .info-panel { background: #0f1510; border: 1px solid #00ff41; padding: 15px; margin-bottom: 10px; border-radius: 5px; }
+        .game-wrapper { max-width: 600px; margin: 0 auto; position: relative; }
         
-        /* --- จุดที่แก้: บังคับให้เป็นช่องพิมพ์แบบไม่มีปุ่มเลื่อนแน่นอน --- */
-        .input-box {
-            background: #000;
-            border: 2px solid #00ff41;
-            color: #fff;
-            padding: 12px;
-            width: 140px;
-            text-align: center;
-            font-size: 1.8rem;
+        /* สไตล์กรอบสีเขียวดั้งเดิม */
+        .info-panel { 
+            background: #000; 
+            border: 2px solid #00ff41; 
+            padding: 20px; 
+            margin-bottom: 20px; 
+            border-radius: 10px;
+            box-shadow: inset 0 0 10px rgba(0, 255, 65, 0.2);
+        }
+        
+        .stats-row { display: flex; justify-content: space-around; margin-bottom: 10px; font-weight: bold; font-size: 1.2rem; }
+        
+        /* --- จุดสำคัญ: แก้ไข Input ให้พิมพ์ได้แต่ดีไซน์เดิม --- */
+        .input-group { margin: 20px 0; display: flex; align-items: center; justify-content: center; gap: 15px; }
+        
+        #user-exponent { 
+            background: #000; 
+            border: 1px solid #00ff41; 
+            color: #4196ff; /* สีน้ำเงินแบบเดิม */
+            padding: 10px; 
+            width: 100px; 
+            text-align: center; 
+            font-size: 1.4rem; 
             outline: none;
-            /* ลบ Spinner ออกทุรูปแบบ */
-            -webkit-appearance: none !important;
-            -moz-appearance: textfield !important;
-            appearance: none !important;
+            /* ลบปุ่มลูกศรออกถาวร */
+            -webkit-appearance: none;
+            -moz-appearance: textfield;
             margin: 0;
-            display: inline-block;
         }
 
-        button#fireBtn { background: #00ff41; color: #000; border: none; padding: 15px 30px; cursor: pointer; font-weight: bold; font-size: 1.3rem; margin-left: 10px; vertical-align: top; }
-        button#fireBtn:disabled { background: #222; color: #444; }
+        button#fireBtn { 
+            background: #00ff41; 
+            color: #000; 
+            border: none; 
+            padding: 10px 30px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            font-size: 1.2rem;
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+        }
         
-        canvas { border: 1px solid #00ff41; background: #000; width: 100%; height: auto; max-width: 500px; margin-top: 20px; }
-        .stats-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-weight: bold; }
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: flex; align-items: center; justify-content: center; z-index: 100; }
-        .modal { background: #0f1510; border: 2px solid #00ff41; padding: 25px; border-radius: 10px; width: 85%; max-width: 350px; }
+        button#fireBtn:hover { background: #fff; }
+        button#fireBtn:disabled { background: #222; color: #444; box-shadow: none; }
+
+        canvas { border: 1px solid #00ff41; background: #000; width: 100%; height: auto; max-width: 550px; }
+        
+        /* Overlay หน้าจอ */
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 100; }
+        .modal { background: #000; border: 2px solid #00ff41; padding: 30px; border-radius: 10px; width: 80%; max-width: 350px; }
     </style>
 </head>
 <body>
 
 <div class="game-wrapper">
-    <!-- หน้าจอ Login -->
+    <!-- หน้า Login -->
     <div id="login-screen" class="overlay">
         <div class="modal">
-            <h3>🎯 Sniper ม.5 (Fixed)</h3>
-            <p style="font-size:0.8rem; color:#888;">พิมพ์คำตอบลงในช่องแล้วกดยิง</p>
+            <h3 style="color:#00ff41">🚀 SNIPER ม.3 #3</h3>
             <input type="text" id="p-name" placeholder="ชื่อ-นามสกุล" style="width:90%; padding:10px; margin-bottom:10px; background:#000; border:1px solid #00ff41; color:#00ff41;"><br>
             <input type="text" id="p-class" placeholder="ชั้น" style="width:40%; padding:10px; background:#000; border:1px solid #00ff41; color:#00ff41;">
             <input type="text" id="p-no" placeholder="เลขที่" style="width:40%; padding:10px; background:#000; border:1px solid #00ff41; color:#00ff41;">
@@ -51,40 +73,41 @@
         </div>
     </div>
 
-    <!-- หน้าจอจบเกม -->
+    <!-- หน้าจบเกม -->
     <div id="finish-screen" class="overlay" style="display:none;">
         <div class="modal">
-            <h2 style="color:#ffff00">🏁 จบเกม</h2>
-            <div id="final-stats" style="margin-bottom:20px"></div>
+            <h2 style="color:#ffff00">🏁 ภารกิจสิ้นสุด</h2>
+            <div id="final-stats" style="margin-bottom:20px; text-align:left;"></div>
             <button onclick="location.reload()">เล่นใหม่</button>
         </div>
     </div>
 
     <div class="info-panel">
+        <div id="player-display" style="font-size:0.9rem; color:#888; margin-bottom:10px;"></div>
         <div class="stats-row">
             <span style="color:#00ff41">ข้อที่: <span id="round-count">1</span>/10</span>
-            <span style="color:#ffff00">Score: <span id="score-val">0</span></span>
+            <span style="color:#00ff41">Score: <span id="score-val">0</span></span>
         </div>
-        <div style="font-size:1.3rem; border-top:1px solid #222; padding-top:10px;">
-            Target: <b>y = <span id="target-y">?</span></b> | Base: <b>a = <span id="current-base">?</span></b>
+        <div style="font-size:1.3rem; border-top:1px dashed #00ff41; padding-top:15px; color:#00ff41;">
+            Target: <span style="color:#fff">y = <span id="target-y">?</span></span> | Base: <span style="color:#fff">a = <span id="current-base">?</span></span>
         </div>
     </div>
 
-    <div style="margin: 20px 0;">
-        <span style="font-size:1.5rem">ค่า x = </span>
-        <!-- เปลี่ยน ID เป็น sniper-input เพื่อล้างค่าจำของ Browser -->
-        <input type="text" id="sniper-input" class="input-box" inputmode="decimal" autocomplete="off" placeholder="?">
+    <div class="input-group">
+        <span style="font-size:1.2rem">ค่า x = </span>
+        <!-- ใช้ type="text" เพื่อกันการเลื่อน แต่หน้าตาเหมือนเดิม -->
+        <input type="text" id="user-exponent" inputmode="decimal" autocomplete="off" placeholder="?">
         <button id="fireBtn" onclick="fire()">FIRE!</button>
     </div>
 
-    <div id="feedback" style="height:1.5em; font-weight:bold; font-size:1.2rem;"></div>
-    <canvas id="graphCanvas" width="500" height="550"></canvas>
+    <div id="feedback" style="height:1.5em; font-weight:bold; margin-bottom:10px;"></div>
+    <canvas id="graphCanvas" width="550" height="550"></canvas>
 </div>
 
 <script>
     const canvas = document.getElementById('graphCanvas');
     const ctx = canvas.getContext('2d');
-    const inputEl = document.getElementById('sniper-input');
+    const inputEl = document.getElementById('user-exponent');
     const fireBtn = document.getElementById('fireBtn');
     const scale = 50;
     const SCRIPT_URL = "ใส่_WEB_APP_URL_ของคุณที่นี่";
@@ -102,6 +125,7 @@
         };
         if(!playerInfo.name || !playerInfo.class || !playerInfo.no) return alert("กรอกข้อมูลให้ครบ");
         document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('player-display').innerText = `👤 ${playerInfo.name} ม.${playerInfo.class} #${playerInfo.no}`;
         initRound();
     }
 
@@ -109,7 +133,6 @@
         if (round > 10) return finishGame();
         isLock = false; isHit = false; lastUserX = null;
         
-        // บังคับเคลียร์ช่องและปลดล็อก
         inputEl.value = '';
         inputEl.disabled = false;
         fireBtn.disabled = false;
@@ -123,7 +146,7 @@
         document.getElementById('round-count').innerText = round;
         document.getElementById('current-base').innerText = base;
         document.getElementById('target-y').innerText = Number(targetY.toFixed(3));
-        document.getElementById('feedback').innerText = "พิมพ์ค่า x แล้วกดยิง!";
+        document.getElementById('feedback').innerText = "เล็งแล้วกดยิง!";
         document.getElementById('feedback').style.color = "#00ff41";
         
         draw();
@@ -133,12 +156,14 @@
     function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         const cx = canvas.width/2, cy = canvas.height/2 + 100;
-        ctx.strokeStyle = "#111";
+        
+        ctx.strokeStyle = "#111"; ctx.lineWidth = 1;
         for(let i=-10; i<=10; i++) {
             ctx.beginPath(); ctx.moveTo(cx+i*scale, 0); ctx.lineTo(cx+i*scale, canvas.height); ctx.stroke();
             ctx.beginPath(); ctx.moveTo(0, cy-i*scale); ctx.lineTo(canvas.width, cy-i*scale); ctx.stroke();
         }
-        ctx.strokeStyle = "#333";
+        
+        ctx.strokeStyle = "#222"; ctx.lineWidth = 2;
         ctx.beginPath(); ctx.moveTo(0, cy); ctx.lineTo(canvas.width, cy); ctx.stroke();
         ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, canvas.height); ctx.stroke();
 
@@ -170,11 +195,11 @@
 
         if (Math.abs(ans - targetX) < 0.01) {
             isHit = true; score += 10;
-            document.getElementById('feedback').innerText = "🎯 สำเร็จ!";
+            document.getElementById('feedback').innerText = "🎯 BULLSEYE!";
             document.getElementById('feedback').style.color = "#00ff41";
         } else {
             score = 0;
-            document.getElementById('feedback').innerText = `❌ พลาด! เฉลยคือ x = ${targetX}`;
+            document.getElementById('feedback').innerText = `❌ MISS! เฉลยคือ ${targetX}`;
             document.getElementById('feedback').style.color = "#ff4141";
         }
 
@@ -186,7 +211,7 @@
 
     function finishGame() {
         document.getElementById('finish-screen').style.display = 'flex';
-        document.getElementById('final-stats').innerHTML = `ชื่อ: ${playerInfo.name}<br>คะแนน: ${score} แต้ม`;
+        document.getElementById('final-stats').innerHTML = `<b>ชื่อ:</b> ${playerInfo.name}<br><b>คะแนน:</b> ${score} แต้ม`;
     }
 </script>
 </body>
