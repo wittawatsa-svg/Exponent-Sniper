@@ -180,13 +180,14 @@ function finishGame() {
         method: "POST",
         mode: "no-cors",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            name: playerInfo.name,
-            class: playerInfo.class,
-            no: playerInfo.no,
-            score: score,
-            targetTab: "Game2"  // <--- เปลี่ยนชื่อแท็บตรงนี้สำหรับ Game 3, 4, 5
-        })
+       body: JSON.stringify({
+    name: playerInfo.name,
+    className: playerInfo.class,
+    no: playerInfo.no,
+    score: score,
+    tabName: "Game2" // <--- ชื่อตรงนี้ต้องตรงกับ "Game2" ที่แถบด้านล่างเป๊ะๆ
+})
+
     })
     .then(() => {
         document.getElementById('status-text').innerText = "✅ บันทึกคะแนนสำเร็จ!";
@@ -196,6 +197,7 @@ function finishGame() {
 </script>
 </body>
 </html>
+
 
 
 
