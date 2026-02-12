@@ -173,10 +173,9 @@ function finishGame() {
         <b>Sniper:</b> ${playerInfo.name}<br>
         <b>Class:</b> ม.${playerInfo.class} เลขที่ ${playerInfo.no}<br>
         <b>คะแนนที่ทำได้:</b> <span style="color:#ffff00; font-size:1.5rem;">${score}</span> / 100 แต้ม
-        <p id="status-text" style="font-size:0.9rem; color:#888;">⏳ กำลังส่งคะแนนไปที่ระบบ...</p>
+        <p id="status-text" style="font-size:0.9rem; color:#888;">⏳ กำลังบันทึกคะแนนลงแท็บ Game2...</p>
     `;
 
-    // ส่งข้อมูลไปยัง Google Sheets
     fetch(SCRIPT_URL, {
         method: "POST",
         mode: "no-cors",
@@ -186,19 +185,16 @@ function finishGame() {
             class: playerInfo.class,
             no: playerInfo.no,
             score: score,
-            game: "Game2" // ระบุชื่อแท็บ
+            targetSheet: "Game2" // <--- เปลี่ยนชื่อแท็บตรงนี้สำหรับ Game 3, 4, 5
         })
     })
     .then(() => {
         document.getElementById('status-text').innerText = "✅ บันทึกคะแนนสำเร็จ!";
         document.getElementById('status-text').style.color = "#00ff41";
-    })
-    .catch(err => {
-        document.getElementById('status-text').innerText = "❌ บันทึกไม่สำเร็จ กรุณาแคปจอส่งครู";
-        document.getElementById('status-text').style.color = "#ff4141";
-        console.error(err);
     });
+}
 </script>
 </body>
 </html>
+
 
