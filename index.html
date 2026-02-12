@@ -165,15 +165,40 @@
         round++;
         setTimeout(initRound, 2000);
     }
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzx-99vfoEz-NdSMz8m3_JB6tj8Ewcv0gPt4wwni0nPAlNeG1s6NTmqzyFwuIAPq4zj/exec"; 
 
-    function finishGame() {
-        document.getElementById('finish-screen').style.display = 'flex';
-        document.getElementById('final-stats').innerHTML = `
-            <b>Sniper:</b> ${playerInfo.name}<br>
-            <b>Class:</b> ม.${playerInfo.class} เลขที่ ${playerInfo.no}<br>
-            <b>คะแนนที่ทำได้:</b> <span style="color:#ffff00; font-size:1.5rem;">${score}</span> / 100 แต้ม
-        `;
-    }
+function finishGame() {
+    document.getElementById('finish-screen').style.display = 'flex';
+    document.getElementById('final-stats').innerHTML = `
+        <b>Sniper:</b> ${playerInfo.name}<br>
+        <b>Class:</b> ม.${playerInfo.class} เลขที่ ${playerInfo.no}<br>
+        <b>คะแนนที่ทำได้:</b> <span style="color:#ffff00; font-size:1.5rem;">${score}</span> / 100 แต้ม
+        <p id="status-text" style="font-size:0.9rem; color:#888;">⏳ กำลังส่งคะแนนไปที่ระบบ...</p>
+    `;
+
+    // ส่งข้อมูลไปยัง Google Sheets
+    fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            name: playerInfo.name,
+            class: playerInfo.class,
+            no: playerInfo.no,
+            score: score,
+            game: "Game2" // ระบุชื่อแท็บ
+        })
+    })
+    .then(() => {
+        document.getElementById('status-text').innerText = "✅ บันทึกคะแนนสำเร็จ!";
+        document.getElementById('status-text').style.color = "#00ff41";
+    })
+    .catch(err => {
+        document.getElementById('status-text').innerText = "❌ บันทึกไม่สำเร็จ กรุณาแคปจอส่งครู";
+        document.getElementById('status-text').style.color = "#ff4141";
+        console.error(err);
+    });
 </script>
 </body>
 </html>
+
