@@ -3,66 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Exponent Sniper M.5 - GitHub Version</title>
+    <title>Exponent Sniper - Type Mode</title>
     <style>
-        body { background: #05070a; color: #00ff41; font-family: 'Courier New', monospace; text-align: center; margin: 0; padding: 10px; }
-        .game-wrapper { max-width: 600px; margin: 0 auto; position: relative; }
+        body { background: #05070a; color: #00ff41; font-family: 'Courier New', monospace; text-align: center; margin: 0; padding: 10px; overflow-x: hidden; }
+        .game-wrapper { max-width: 600px; margin: 0 auto; }
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: flex; align-items: center; justify-content: center; z-index: 100; }
-        .modal { background: #0f1510; border: 2px solid #00ff41; padding: 30px; border-radius: 10px; box-shadow: 0 0 20px #00ff41; width: 85%; max-width: 400px; }
-        .info-panel { background: #0f1510; border: 1px solid #00ff41; padding: 15px; margin-bottom: 10px; border-radius: 5px; }
-        .stats-row { display: flex; justify-content: space-around; margin: 10px 0; font-weight: bold; border-bottom: 1px dashed #333; padding-bottom: 5px; }
-        canvas { border: 1px solid #00ff41; background: #000; box-shadow: 0 0 20px rgba(0, 255, 65, 0.2); max-width: 100%; height: auto; margin-top: 10px; }
-        input { background: #000; border: 1px solid #00ff41; color: #00ff41; padding: 10px; width: 100px; text-align: center; outline: none; margin: 5px; font-size: 1.2rem; }
-        button { background: #00ff41; color: #000; border: none; padding: 10px 25px; cursor: pointer; font-weight: bold; margin-top: 10px; font-family: 'Courier New', monospace; }
-        button:hover { background: #fff; box-shadow: 0 0 15px #fff; }
-        button:disabled { background: #444; cursor: not-allowed; box-shadow: none; }
-        #feedback { font-size: 1.1rem; height: 30px; font-weight: bold; margin: 10px 0; }
-        .loading-dots:after { content: '...'; animation: dots 1s infinite; }
-        @keyframes dots { 0%, 20% { content: '.'; } 40% { content: '..'; } 60%, 100% { content: '...'; } }
+        .modal { background: #0f1510; border: 2px solid #00ff41; padding: 25px; border-radius: 10px; width: 85%; max-width: 350px; }
+        .info-panel { background: #0f1510; border: 1px solid #00ff41; padding: 10px; margin-bottom: 10px; border-radius: 5px; font-size: 0.9rem; }
+        canvas { border: 1px solid #00ff41; background: #000; width: 100%; height: auto; max-width: 500px; }
+        /* ปรับ Input ให้พิมพ์ง่ายขึ้น */
+        input[type="text"], input[type="number"] { 
+            background: #000; border: 2px solid #00ff41; color: #00ff41; 
+            padding: 12px; width: 120px; text-align: center; font-size: 1.5rem; 
+            margin: 10px; outline: none; border-radius: 5px;
+        }
+        button { background: #00ff41; color: #000; border: none; padding: 12px 30px; cursor: pointer; font-weight: bold; font-size: 1rem; }
+        button:disabled { background: #333; color: #666; }
+        #feedback { font-size: 1.2rem; font-weight: bold; margin: 10px 0; min-height: 1.5em; }
     </style>
 </head>
 <body>
 
 <div class="game-wrapper">
-    <!-- หน้าล็อคอิน -->
+    <!-- Login -->
     <div id="login-screen" class="overlay">
         <div class="modal">
-            <h3>🚀 ลงทะเบียน Sniper (ม.5)</h3>
-            <p style="color: #ff4141; font-size: 0.8rem;">กติกา: วิเคราะห์ค่า x จากกราฟ | ตอบผิดแต้ม Reset!</p>
-            <input type="text" id="p-name" placeholder="ชื่อ-นามสกุล" style="width: 80%"><br>
-            <input type="text" id="p-class" placeholder="ชั้น (เช่น 5/1)" style="width: 40%">
-            <input type="number" id="p-no" placeholder="เลขที่" style="width: 30%">
-            <br><button onclick="startGame()">เริ่มภารกิจ</button>
+            <h2 style="margin-top:0">🎯 Sniper M.5</h2>
+            <input type="text" id="p-name" placeholder="ชื่อ-นามสกุล" style="width:80%; font-size: 1rem;"><br>
+            <input type="text" id="p-class" placeholder="ชั้น" style="width:35%; font-size: 1rem;">
+            <input type="text" id="p-no" placeholder="เลขที่" style="width:35%; font-size: 1rem;">
+            <br><button onclick="startGame()">เริ่มเกม</button>
         </div>
     </div>
 
-    <!-- หน้าจบเกม -->
+    <!-- Finish -->
     <div id="finish-screen" class="overlay" style="display:none;">
         <div class="modal">
-            <h2 style="color:#ffff00">🏁 ภารกิจสิ้นสุด</h2>
-            <div id="final-stats" style="text-align:left; margin: 20px 0; line-height: 1.8;"></div>
-            <p id="save-status" style="font-size: 0.9rem; color: #00ff41;"></p>
-            <button onclick="location.reload()">เล่นใหม่อีกครั้ง</button>
+            <h2 style="color:#ffff00">🏁 จบภารกิจ</h2>
+            <div id="final-stats" style="margin-bottom:15px"></div>
+            <p id="save-status"></p>
+            <button onclick="location.reload()">เล่นใหม่</button>
         </div>
     </div>
 
-    <h2>🎯 Exponent Sniper</h2>
     <div class="info-panel">
-        <div id="player-display" style="font-size: 0.8rem; color: #888;"></div>
-        <div class="stats-row">
-            <div>ข้อที่: <span id="round-count">1</span>/10</div>
-            <div>Score: <span id="score-val" style="color:#ffff00">0</span></div>
+        <div id="player-display"></div>
+        <div style="display:flex; justify-content: space-around; font-weight:bold; color:#ffff00; margin:5px 0;">
+            <span>ข้อที่: <span id="round-count">1</span>/10</span>
+            <span>คะแนน: <span id="score-val">0</span></span>
         </div>
-        <div>สมการ: <strong><span id="target-y">?</span> = <span id="current-base">?</span><sup>x</sup></strong></div>
+        <div style="font-size:1.2rem">โจทย์: <span id="target-y">?</span> = <span id="current-base">?</span><sup>x</sup></div>
     </div>
 
-    <div class="input-group">
-        <span>ค่า x = </span>
-        <input type="number" id="user-exponent" step="0.1" placeholder="?">
-        <button id="fireBtn" onclick="fire()">FIRE!</button>
+    <div style="margin: 15px 0;">
+        <span style="font-size:1.2rem">พิมพ์ค่า x =</span>
+        <!-- เปลี่ยนเป็น type="text" เพื่อป้องกันระบบเลื่อน (Spinner) ของ Browser -->
+        <input type="text" id="user-exponent" autocomplete="off" placeholder="...">
+        <button id="fireBtn" onclick="fire()">ยิง!</button>
     </div>
-    <p id="feedback">เล็งแล้วกดยิง!</p>
-    <canvas id="graphCanvas" width="550" height="550"></canvas>
+
+    <div id="feedback"></div>
+    <canvas id="graphCanvas" width="500" height="600"></canvas>
 </div>
 
 <script>
@@ -70,15 +71,13 @@
     const ctx = canvas.getContext('2d');
     const inputEl = document.getElementById('user-exponent');
     const fireBtn = document.getElementById('fireBtn');
-    const scale = 50; 
+    const scale = 50;
+    const SCRIPT_URL = "ใส่_WEB_APP_URL_ของคุณที่นี่";
 
-    // *** วาง URL ของ Google Apps Script ที่นี่ ***
-    const SCRIPT_URL = "ใส่_WEB_APP_URL_ของคุณที่นี่"; 
-
-    let base, targetX, targetY, lastUserX = null, score = 0, round = 1, isHit = false, isProcessing = false;
+    let base, targetX, targetY, lastUserX = null, score = 0, round = 1, isHit = false, isLock = false;
     let playerInfo = {};
 
-    // รองรับการกด Enter
+    // กด Enter เพื่อยิง
     inputEl.addEventListener('keypress', (e) => { if(e.key === 'Enter') fire(); });
 
     function startGame() {
@@ -87,27 +86,29 @@
             class: document.getElementById('p-class').value,
             no: document.getElementById('p-no').value
         };
-        if (!playerInfo.name || !playerInfo.class || !playerInfo.no) return alert("กรุณากรอกข้อมูลให้ครบ");
+        if(!playerInfo.name || !playerInfo.class || !playerInfo.no) return alert("กรอกข้อมูลให้ครบ");
         document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('player-display').innerText = `👤 ${playerInfo.name} ม.${playerInfo.class} #${playerInfo.no}`;
+        document.getElementById('player-display').innerText = `👤 ${playerInfo.name} (${playerInfo.class}) #${playerInfo.no}`;
         initRound();
     }
 
     function initRound() {
         if (round > 10) return finishGame();
         
-        isProcessing = false;
+        // Reset ทุกอย่าง
+        isLock = false;
         isHit = false;
         lastUserX = null;
         inputEl.value = '';
         inputEl.disabled = false;
         fireBtn.disabled = false;
+        
         document.getElementById('round-count').innerText = round;
-        document.getElementById('feedback').innerText = "ระบุค่า x เพื่อทำลายเป้าหมาย!";
+        document.getElementById('feedback').innerText = "เล็งเป้าหมายแล้วยิง!";
         document.getElementById('feedback').style.color = "#00ff41";
 
         const basePool = [2, 3, 5, 0.5, 0.2];
-        const exps = [-2, -1, 0, 0.5, 1, 2];
+        const exps = [-2, -1, 0, 1, 2]; // ตัด 0.5 ออกชั่วคราวเพื่อให้คำนวณในใจง่ายขึ้น
         base = basePool[Math.floor(Math.random() * basePool.length)];
         targetX = exps[Math.floor(Math.random() * exps.length)];
         targetY = Math.pow(base, targetX);
@@ -116,64 +117,66 @@
         document.getElementById('target-y').innerText = Number(targetY.toFixed(3));
         
         draw();
-        inputEl.focus();
+        setTimeout(() => inputEl.focus(), 100);
     }
 
     function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         const cx = canvas.width/2, cy = canvas.height/2 + 100;
         
-        // วาด Grid
+        // Grid
         ctx.strokeStyle = "#111"; ctx.lineWidth = 1;
         for(let i=-10; i<=10; i++) {
-            ctx.beginPath(); ctx.moveTo(cx+i*scale,0); ctx.lineTo(cx+i*scale,canvas.height); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(0,cy-i*scale); ctx.lineTo(canvas.width,cy-i*scale); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(cx+i*scale, 0); ctx.lineTo(cx+i*scale, canvas.height); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(0, cy-i*scale); ctx.lineTo(canvas.width, cy-i*scale); ctx.stroke();
         }
         
-        // แกน X-Y
-        ctx.strokeStyle = "#333"; ctx.beginPath(); ctx.moveTo(0,cy); ctx.lineTo(canvas.width,cy); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(cx,0); ctx.lineTo(cx,canvas.height); ctx.stroke();
+        // แกน
+        ctx.strokeStyle = "#444"; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(0, cy); ctx.lineTo(canvas.width, cy); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, canvas.height); ctx.stroke();
 
-        // วาดเส้นกราฟเมื่อยิงแล้ว
+        // เส้นกราฟเฉลย (จะวาดเมื่อยิงแล้ว)
         if (lastUserX !== null) {
-            ctx.strokeStyle = isHit ? "#00ff41" : "#ff4141"; 
-            ctx.lineWidth = 4; ctx.beginPath();
+            ctx.strokeStyle = isHit ? "#00ff41" : "#ff4141";
+            ctx.lineWidth = 4;
+            ctx.beginPath();
             let first = true;
-            // วาดกราฟ a^x ตามที่ผู้เล่นตอบ
-            for (let x = -8; x <= lastUserX; x += 0.05) {
+            for (let x = -8; x <= lastUserX; x += 0.1) {
                 let py = cy - Math.pow(base, x) * scale;
-                if (first) { ctx.moveTo(cx+x*scale, py); first = false; } else { ctx.lineTo(cx+x*scale, py); }
+                if (first) { ctx.moveTo(cx + x*scale, py); first = false; }
+                else { ctx.lineTo(cx + x*scale, py); }
             }
             ctx.stroke();
         }
 
-        // วาดเป้าหมาย (สีแดง)
+        // เป้าหมาย
         ctx.fillStyle = isHit ? "#fff" : "red";
-        ctx.beginPath(); 
-        ctx.arc(cx+targetX*scale, cy-targetY*scale, isHit?15:8, 0, Math.PI*2); 
+        ctx.shadowBlur = 15; ctx.shadowColor = ctx.fillStyle;
+        ctx.beginPath();
+        ctx.arc(cx + targetX*scale, cy - targetY*scale, isHit?15:10, 0, Math.PI*2);
         ctx.fill();
-        if(!isHit) { // วาดเป้าเล็ง
-            ctx.strokeStyle = "red"; ctx.lineWidth = 2;
-            ctx.beginPath(); ctx.arc(cx+targetX*scale, cy-targetY*scale, 15, 0, Math.PI*2); ctx.stroke();
-        }
+        ctx.shadowBlur = 0;
     }
 
     function fire() {
-        if (inputEl.value === "" || isProcessing) return;
+        if (inputEl.value === "" || isLock) return;
         
-        isProcessing = true;
-        lastUserX = parseFloat(inputEl.value);
+        isLock = true;
+        let userAns = parseFloat(inputEl.value);
+        lastUserX = userAns;
+        
         inputEl.disabled = true;
         fireBtn.disabled = true;
 
-        if (Math.abs(lastUserX - targetX) <= 0.01) {
-            isHit = true; 
+        if (Math.abs(userAns - targetX) < 0.01) {
+            isHit = true;
             score += 10;
-            document.getElementById('feedback').innerText = "🎯 BULLSEYE! คำนวณได้แม่นยำ";
+            document.getElementById('feedback').innerText = "🎯 สำเร็จ! ยิงถูกเป้า";
             document.getElementById('feedback').style.color = "#00ff41";
         } else {
-            score = 0; // กติกาตอบผิดแต้มเหลือ 0
-            document.getElementById('feedback').innerText = `❌ MISS! ค่าที่ถูกคือ ${targetX}`;
+            score = 0;
+            document.getElementById('feedback').innerText = `❌ พลาด! คำตอบคือ x = ${targetX}`;
             document.getElementById('feedback').style.color = "#ff4141";
         }
 
@@ -181,25 +184,24 @@
         draw();
         
         round++;
-        setTimeout(initRound, 1800);
+        setTimeout(initRound, 2000);
     }
 
     async function finishGame() {
         document.getElementById('finish-screen').style.display = 'flex';
-        document.getElementById('final-stats').innerHTML = `ชื่อ: ${playerInfo.name}<br>ชั้น: ม.${playerInfo.class} เลขที่: ${playerInfo.no}<br>คะแนนรวม: ${score} แต้ม`;
-        document.getElementById('save-status').className = 'loading-dots';
-        document.getElementById('save-status').innerText = 'กำลังบันทึกคะแนนลงระบบ';
+        document.getElementById('final-stats').innerHTML = `<b>ผู้เล่น:</b> ${playerInfo.name}<br><b>คะแนน:</b> ${score} แต้ม`;
+        const status = document.getElementById('save-status');
+        status.innerText = "⏳ กำลังส่งคะแนน...";
         
         try {
-            const response = await fetch(SCRIPT_URL, {
+            await fetch(SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
-                body: JSON.stringify({...playerInfo, score: score, game: "Sniper-V2"})
+                body: JSON.stringify({...playerInfo, score: score})
             });
-            document.getElementById('save-status').className = '';
-            document.getElementById('save-status').innerText = '✅ บันทึกสำเร็จ! (Google Sheets)';
-        } catch (e) {
-            document.getElementById('save-status').innerText = '❌ บันทึกไม่สำเร็จ (ตรวจสอบ URL)';
+            status.innerText = "✅ บันทึกลงระบบเรียบร้อย";
+        } catch(e) {
+            status.innerText = "❌ เชื่อมต่อ Google Sheet ไม่ได้";
         }
     }
 </script>
