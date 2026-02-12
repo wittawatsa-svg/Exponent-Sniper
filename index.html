@@ -89,17 +89,31 @@
     }
 
     function initRound() {
-        if (round > 10) return finishGame();
-        document.getElementById('round-count').innerText = round;
-        const basePool = [2, 3, 5, 0.5, 0.2];
-        const exps = [-2, -1, 0, 0.5, 1, 2];
-        base = basePool[Math.floor(Math.random() * basePool.length)];
-        targetX = exps[Math.floor(Math.random() * exps.length)];
-        targetY = Math.pow(base, targetX);
-        document.getElementById('current-base').innerText = base;
-        document.getElementById('target-y').innerText = Number(targetY.toFixed(3));
-        inputEl.value = ''; lastUserX = null; isHit = false; draw();
-    }
+    if (round > 10) return finishGame();
+    
+    document.getElementById('round-count').innerText = round;
+    
+    // สุ่มโจทย์ใหม่
+    const basePool = [2, 3, 5, 0.5, 0.2];
+    const exps = [-2, -1, 0, 0.5, 1, 2];
+    base = basePool[Math.floor(Math.random() * basePool.length)];
+    targetX = exps[Math.floor(Math.random() * exps.length)];
+    targetY = Math.pow(base, targetX);
+    
+    // --- จุดสำคัญ: ล้างค่าหน้าจอสำหรับข้อใหม่ ---
+    document.getElementById('current-base').innerText = base;
+    document.getElementById('target-y').innerText = Number(targetY.toFixed(3));
+    
+    inputEl.value = ''; // ล้างช่องพิมพ์ให้ว่าง
+    inputEl.disabled = false; // เปิดให้พิมพ์ได้
+    inputEl.focus(); // เอาเคอร์เซอร์ไปวางรอไว้เลย
+    
+    lastUserX = null; // ล้างเส้นกราฟเก่า
+    isHit = false; 
+    document.getElementById('feedback').innerText = ""; 
+    draw();
+}
+
 
     function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -125,42 +139,28 @@
         ctx.beginPath(); ctx.arc(cx+targetX*scale, cy-targetY*scale, isHit?15:8, 0, Math.PI*2); ctx.fill();
     }
 
-   // --- ส่วนที่ปรับปรุงในฟังก์ชัน fire() ---
 function fire() {
-    const userInput = inputEl.value.trim();
-    if (userInput === "") return;
+    if (!inputEl.value || isHit) return; // ถ้าส่งแล้วหรือว่างอยู่ ไม่ให้ทำต่อ
+    
+    lastUserX = parseFloat(inputEl.value);
+    inputEl.disabled = true; // ล็อคช่องพิมพ์ขณะเฉลย
 
-    // แปลงคำตอบ (รองรับทั้งเลขทศนิยม และจำนวนเต็ม)
-    lastUserX = parseFloat(userInput);
-
-    // ตรวจสอบว่าคำตอบ (lastUserX) ตรงกับ targetX (เลขชี้กำลังที่สุ่มไว้) หรือไม่
-    // ใช้ Math.abs เทียบส่วนต่างเพื่อรองรับความคลาดเคลื่อนของทศนิยมเล็กน้อย
-    if (Math.abs(lastUserX - targetX) < 0.01) {
+    if (Math.abs(lastUserX - targetX) <= 0.1) {
         isHit = true; 
         score += 10;
-        document.getElementById('feedback').innerText = "🎯 ถูกต้อง! แม่นยำมาก";
+        document.getElementById('feedback').innerText = "🎯 ถูกต้อง!";
         document.getElementById('feedback').style.color = "#00ff41";
     } else {
-        // ถ้าตอบผิด คะแนนในรอบนั้นจะเป็น 0 หรือจะหักคะแนนตามต้องการ
-        document.getElementById('feedback').innerText = `❌ พลาดไปนิด! คำตอบที่ถูกคือ ${targetX}`;
+        document.getElementById('feedback').innerText = `❌ ผิด! คำตอบคือ ${targetX}`;
         document.getElementById('feedback').style.color = "#ff4141";
     }
-
+    
     document.getElementById('score-val').innerText = score;
     draw(); 
-    round++; 
     
-    // หน่วงเวลา 1.5 วินาทีก่อนเริ่มรอบถัดไป เพื่อให้ผู้เล่นดูเฉลยบนกราฟ
-    setTimeout(initRound, 1500);
+    round++; 
+    setTimeout(initRound, 1500); // รอ 1.5 วินาทีแล้วขึ้นข้อใหม่
 }
-
-// เพิ่ม Event Listener ให้กด Enter เพื่อยิงได้เลย
-inputEl.addEventListener('keypress', function (e) {
-    if (e.key === 'Enter') {
-        fire();
-    }
-});
-
 
     async function finishGame() {
         document.getElementById('finish-screen').style.display = 'flex';
@@ -185,4 +185,5 @@ inputEl.addEventListener('keypress', function (e) {
 </script>
 </body>
 </html>
+
 
