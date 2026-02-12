@@ -3,78 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Exponent Sniper - Math Example</title>
+    <title>Exponent Sniper M.3 - Final Version</title>
     <style>
         body { background: #05070a; color: #00ff41; font-family: 'Courier New', monospace; text-align: center; margin: 0; padding: 10px; }
-        .game-wrapper { max-width: 600px; margin: 0 auto; }
-        
-        /* กรอบแสดงโจทย์และตัวอย่าง */
-        .info-panel { 
-            background: #000; border: 2px solid #00ff41; padding: 20px; 
-            margin-bottom: 15px; border-radius: 10px; box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
-        }
-        
-        .example-box {
-            background: #0a110a; border: 1px dashed #00ff41; padding: 10px;
-            margin-top: 10px; font-size: 0.9rem; color: #ffff00;
-        }
-
+        .game-wrapper { max-width: 600px; margin: 0 auto; position: relative; }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: flex; align-items: center; justify-content: center; z-index: 100; }
+        .modal { background: #000; border: 2px solid #00ff41; padding: 30px; border-radius: 10px; width: 85%; max-width: 350px; box-shadow: 0 0 20px #00ff41; }
+        .info-panel { background: #000; border: 2px solid #00ff41; padding: 15px; margin-bottom: 15px; border-radius: 10px; }
         .stats-row { display: flex; justify-content: space-around; font-weight: bold; font-size: 1.1rem; margin-bottom: 10px; }
-        
-        /* ช่องพิมพ์ตอบ (ลบ Spinner ออกแล้ว) */
-        #user-exponent { 
-            background: #000; border: 1px solid #00ff41; color: #4196ff;
-            padding: 10px; width: 100px; text-align: center; font-size: 1.4rem; outline: none;
-            -webkit-appearance: none; -moz-appearance: textfield; margin: 0;
-        }
-
-        button#fireBtn { background: #00ff41; color: #000; border: none; padding: 12px 30px; cursor: pointer; font-weight: bold; font-size: 1.2rem; }
-        button#fireBtn:disabled { background: #222; color: #444; }
+        input { background: #000; border: 1px solid #00ff41; color: #4196ff; padding: 10px; width: 100px; text-align: center; font-size: 1.4rem; outline: none; -webkit-appearance: none; margin: 0; }
+        button { background: #00ff41; color: #000; border: none; padding: 12px 25px; cursor: pointer; font-weight: bold; font-size: 1.1rem; border-radius: 5px; }
+        button:hover { background: #fff; box-shadow: 0 0 10px #fff; }
         canvas { border: 1px solid #00ff41; background: #000; width: 100%; height: auto; max-width: 550px; }
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 100; }
-        .modal { background: #000; border: 2px solid #00ff41; padding: 30px; border-radius: 10px; width: 80%; max-width: 350px; }
+        #feedback { height: 1.5em; font-weight: bold; margin: 10px 0; }
+        .example-hint { font-size: 0.85rem; color: #ffff00; margin-top: 10px; border-top: 1px dashed #333; padding-top: 10px; }
     </style>
 </head>
 <body>
 
 <div class="game-wrapper">
-    <!-- Login Screen -->
+    <!-- หน้าจอเริ่มเกม (Login) -->
     <div id="login-screen" class="overlay">
         <div class="modal">
-            <h3 style="color:#00ff41">🚀 SNIPER ม.3 #3</h3>
-            <p style="font-size:0.8rem">หาค่า x จากสมการ y = a<sup>x</sup></p>
-            <input type="text" id="p-name" placeholder="ชื่อ-นามสกุล" style="width:90%; padding:10px; margin-bottom:10px; background:#000; border:1px solid #00ff41; color:#00ff41;"><br>
-            <input type="text" id="p-class" placeholder="ชั้น" style="width:40%; padding:10px; background:#000; border:1px solid #00ff41; color:#00ff41;">
-            <input type="text" id="p-no" placeholder="เลขที่" style="width:40%; padding:10px; background:#000; border:1px solid #00ff41; color:#00ff41;">
-            <br><button onclick="startGame()" style="margin-top:20px; width:100%;">เริ่มภารกิจ</button>
+            <h2 style="color:#00ff41; margin-top:0;">🎯 Sniper ม.3 #3</h2>
+            <p>ภารกิจ: หาค่า x จาก y = a<sup>x</sup></p>
+            <input type="text" id="p-name" placeholder="ชื่อ-นามสกุล" style="width:85%; margin-bottom:10px; color:#00ff41;"><br>
+            <input type="text" id="p-class" placeholder="ชั้น" style="width:40%; color:#00ff41;">
+            <input type="text" id="p-no" placeholder="เลขที่" style="width:40%; color:#00ff41;">
+            <br><button onclick="startGame()" style="margin-top:20px; width:90%;">เริ่มภารกิจ</button>
+        </div>
+    </div>
+
+    <!-- หน้าจอจบเกม (Summary) -->
+    <div id="finish-screen" class="overlay" style="display:none;">
+        <div class="modal">
+            <h2 style="color:#ffff00">🏁 ภารกิจสิ้นสุด</h2>
+            <div id="final-stats" style="margin: 20px 0; text-align: left; line-height: 1.6;"></div>
+            <button onclick="location.reload()" style="width:100%; background:#ffff00;">🔄 เริ่มใหม่อีกครั้ง</button>
         </div>
     </div>
 
     <div class="info-panel">
+        <div id="player-display" style="font-size:0.8rem; color:#888; margin-bottom:5px;"></div>
         <div class="stats-row">
             <span>ข้อที่: <span id="round-count">1</span>/10</span>
-            <span>Score: <span id="score-val">0</span></span>
+            <span>Score: <span id="score-val" style="color:#ffff00">0</span></span>
         </div>
-        
-        <!-- ส่วนแสดงโจทย์หลัก -->
-        <div style="font-size:1.4rem; color:#00ff41; margin:10px 0;">
+        <div style="font-size:1.3rem; color:#00ff41;">
             โจทย์: <span style="color:#fff"><span id="target-y">?</span> = <span id="current-base">?</span><sup>x</sup></span>
         </div>
-
-        <!-- ส่วนตัวอย่างสมการสำหรับเด็ก -->
-        <div class="example-box">
-            💡 <b>ตัวอย่าง:</b> ถ้า y=9 และ a=3 สมการคือ 9=3<sup>x</sup> <br>
-            จะได้ 9 = 3 &times; 3 ดังนั้น <b>x = 2</b>
-        </div>
+        <div class="example-hint">💡 วิเคราะห์: ฐาน (<span id="hint-base">?</span>) ยกกำลังอะไรได้ <span id="hint-y">?</span></div>
     </div>
 
     <div style="margin-bottom: 15px;">
-        <span style="font-size:1.2rem">เติมค่า x = </span>
+        <span style="font-size:1.2rem">ค่า x = </span>
         <input type="text" id="user-exponent" inputmode="decimal" autocomplete="off" placeholder="?">
         <button id="fireBtn" onclick="fire()">FIRE!</button>
     </div>
 
-    <div id="feedback" style="height:1.5em; font-weight:bold; margin-bottom:10px;"></div>
+    <div id="feedback">เตรียมตัวเล็ง...</div>
     <canvas id="graphCanvas" width="550" height="550"></canvas>
 </div>
 
@@ -96,18 +83,20 @@
             class: document.getElementById('p-class').value,
             no: document.getElementById('p-no').value
         };
-        if(!playerInfo.name || !playerInfo.class || !playerInfo.no) return alert("กรอกข้อมูลให้ครบ");
+        if(!playerInfo.name || !playerInfo.class || !playerInfo.no) return alert("กรุณากรอกข้อมูลให้ครบ");
         document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('player-display').innerText = `👤 SNIPER: ${playerInfo.name} (${playerInfo.class})`;
         initRound();
     }
 
     function initRound() {
-        if (round > 10) return; 
+        if (round > 10) return finishGame(); // เมื่อครบ 10 ข้อ ให้จบเกม
+        
         isLock = false; isHit = false; lastUserX = null;
         inputEl.value = ''; inputEl.disabled = false; fireBtn.disabled = false;
         
-        // สุ่มเลขฐานและเลขชี้กำลัง
-        const basePool = [2, 3, 5, 10];
+        // สุ่มโจทย์
+        const basePool = [2, 3, 4, 5, 10];
         const exps = [-1, 0, 1, 2, 3]; 
         base = basePool[Math.floor(Math.random() * basePool.length)];
         targetX = exps[Math.floor(Math.random() * exps.length)];
@@ -116,7 +105,9 @@
         document.getElementById('round-count').innerText = round;
         document.getElementById('current-base').innerText = base;
         document.getElementById('target-y').innerText = Number(targetY.toFixed(3));
-        document.getElementById('feedback').innerText = "คำนวณค่า x แล้วกดยิง!";
+        document.getElementById('hint-base').innerText = base;
+        document.getElementById('hint-y').innerText = Number(targetY.toFixed(3));
+        document.getElementById('feedback').innerText = "พิมพ์ค่า x แล้วกดยิง!";
         document.getElementById('feedback').style.color = "#00ff41";
         
         draw();
@@ -126,20 +117,15 @@
     function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         const cx = canvas.width/2, cy = canvas.height/2 + 100;
-        
-        // Grid
         ctx.strokeStyle = "#111";
         for(let i=-10; i<=10; i++) {
             ctx.beginPath(); ctx.moveTo(cx+i*scale, 0); ctx.lineTo(cx+i*scale, canvas.height); ctx.stroke();
             ctx.beginPath(); ctx.moveTo(0, cy-i*scale); ctx.lineTo(canvas.width, cy-i*scale); ctx.stroke();
         }
-        
-        // Axes
         ctx.strokeStyle = "#333";
         ctx.beginPath(); ctx.moveTo(0, cy); ctx.lineTo(canvas.width, cy); ctx.stroke();
         ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, canvas.height); ctx.stroke();
 
-        // เมื่อยิงแล้ว วาดเส้นฟังก์ชัน y = a^x
         if (lastUserX !== null) {
             ctx.strokeStyle = isHit ? "#fff" : "#ff4141";
             ctx.lineWidth = 4;
@@ -152,11 +138,8 @@
             ctx.stroke();
         }
 
-        // เป้าหมาย
         ctx.fillStyle = isHit ? "#fff" : "red";
-        ctx.beginPath();
-        ctx.arc(cx + targetX*scale, cy - targetY*scale, isHit?15:10, 0, Math.PI*2);
-        ctx.fill();
+        ctx.beginPath(); ctx.arc(cx + targetX*scale, cy - targetY*scale, isHit?15:10, 0, Math.PI*2); ctx.fill();
     }
 
     function fire() {
@@ -169,10 +152,10 @@
 
         if (Math.abs(ans - targetX) < 0.01) {
             isHit = true; score += 10;
-            document.getElementById('feedback').innerText = "🎯 ถูกต้อง! แม่นยำมาก";
+            document.getElementById('feedback').innerText = "🎯 BULLSEYE! ยิงถูกเป้า";
             document.getElementById('feedback').style.color = "#00ff41";
         } else {
-            score = 0;
+            score = 0; // กติกาตอบผิดแต้ม Reset
             document.getElementById('feedback').innerText = `❌ พลาด! คำตอบคือ x = ${targetX}`;
             document.getElementById('feedback').style.color = "#ff4141";
         }
@@ -180,7 +163,16 @@
         document.getElementById('score-val').innerText = score;
         draw();
         round++;
-        setTimeout(initRound, 1500);
+        setTimeout(initRound, 1800);
+    }
+
+    function finishGame() {
+        document.getElementById('finish-screen').style.display = 'flex';
+        document.getElementById('final-stats').innerHTML = `
+            <b>Sniper:</b> ${playerInfo.name}<br>
+            <b>Class:</b> ม.${playerInfo.class} เลขที่ ${playerInfo.no}<br>
+            <b>คะแนนรวมทั้งหมด:</b> <span style="color:#ffff00; font-size:1.5rem;">${score}</span> แต้ม
+        `;
     }
 </script>
 </body>
