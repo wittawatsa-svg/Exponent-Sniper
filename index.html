@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Exponent Sniper M.3 - Final Version</title>
+    <title>Exponent Sniper M.3 - No Reset Version</title>
     <style>
         body { background: #05070a; color: #00ff41; font-family: 'Courier New', monospace; text-align: center; margin: 0; padding: 10px; }
         .game-wrapper { max-width: 600px; margin: 0 auto; position: relative; }
@@ -22,7 +22,7 @@
 <body>
 
 <div class="game-wrapper">
-    <!-- หน้าจอเริ่มเกม (Login) -->
+    <!-- หน้าจอ Login -->
     <div id="login-screen" class="overlay">
         <div class="modal">
             <h2 style="color:#00ff41; margin-top:0;">🎯 Sniper ม.3 #3</h2>
@@ -34,7 +34,7 @@
         </div>
     </div>
 
-    <!-- หน้าจอจบเกม (Summary) -->
+    <!-- หน้าจอจบเกม -->
     <div id="finish-screen" class="overlay" style="display:none;">
         <div class="modal">
             <h2 style="color:#ffff00">🏁 ภารกิจสิ้นสุด</h2>
@@ -90,13 +90,12 @@
     }
 
     function initRound() {
-        if (round > 10) return finishGame(); // เมื่อครบ 10 ข้อ ให้จบเกม
+        if (round > 10) return finishGame();
         
         isLock = false; isHit = false; lastUserX = null;
         inputEl.value = ''; inputEl.disabled = false; fireBtn.disabled = false;
         
-        // สุ่มโจทย์
-        const basePool = [2, 3, 4, 5, 10];
+        const basePool = [2, 3, 5, 10]; // ปรับฐานให้เด็กคิดง่ายขึ้น
         const exps = [-1, 0, 1, 2, 3]; 
         base = basePool[Math.floor(Math.random() * basePool.length)];
         targetX = exps[Math.floor(Math.random() * exps.length)];
@@ -151,19 +150,20 @@
         fireBtn.disabled = true;
 
         if (Math.abs(ans - targetX) < 0.01) {
-            isHit = true; score += 10;
+            isHit = true; 
+            score += 10; // ตอบถูกได้ 10 คะแนน
             document.getElementById('feedback').innerText = "🎯 BULLSEYE! ยิงถูกเป้า";
             document.getElementById('feedback').style.color = "#00ff41";
         } else {
-            score = 0; // กติกาตอบผิดแต้ม Reset
-            document.getElementById('feedback').innerText = `❌ พลาด! คำตอบคือ x = ${targetX}`;
+            // แก้ไขตรงนี้: ตอบผิด คะแนน (score) จะเท่าเดิม ไม่โดน Reset เป็น 0
+            document.getElementById('feedback').innerText = `❌ พลาด! คำตอบที่ถูกคือ x = ${targetX}`;
             document.getElementById('feedback').style.color = "#ff4141";
         }
 
         document.getElementById('score-val').innerText = score;
         draw();
         round++;
-        setTimeout(initRound, 1800);
+        setTimeout(initRound, 2000);
     }
 
     function finishGame() {
@@ -171,7 +171,7 @@
         document.getElementById('final-stats').innerHTML = `
             <b>Sniper:</b> ${playerInfo.name}<br>
             <b>Class:</b> ม.${playerInfo.class} เลขที่ ${playerInfo.no}<br>
-            <b>คะแนนรวมทั้งหมด:</b> <span style="color:#ffff00; font-size:1.5rem;">${score}</span> แต้ม
+            <b>คะแนนที่ทำได้:</b> <span style="color:#ffff00; font-size:1.5rem;">${score}</span> / 100 แต้ม
         `;
     }
 </script>
